@@ -1,0 +1,12 @@
+/** @format */
+
+.logo {
+	background: #001529;
+	padding: 16px;
+	color: #fff;
+	text-align: center;
+	font-weight: bold;
+	font-size: 20px;
+	height: 63px;
+	border-bottom: 1px solid;
+}

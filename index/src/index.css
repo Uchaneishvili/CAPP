@@ -1,0 +1,26 @@
+/** @format */
+
+body {
+	margin: 0;
+}
+
+.breadCrumb {
+	margin: 10px 0px;
+	background: #ffffff;
+	padding: 5px 10px;
+}
+.rightContainer {
+	display: flex;
+	align-items: center;
+}
+
+.header {
+	padding: 0;
+	position: relative;
+	display: flex;
+	justify-content: flex-end;
+	height: 72px;
+	z-index: 9;
+	align-items: center;
+	background-color: #ffffff !important;
+}
