@@ -104,8 +104,6 @@ app.put('/:id', async (req: Request, res: Response) => {
 	}
 });
 
-// Delete existing data
-
 // DELETE request to delete a specific item by id
 app.delete('/:id', async (req: Request, res: Response) => {
 	try {

@@ -8,9 +8,11 @@ import { ColumnProps } from 'antd/lib/table';
 import { IEmployee } from '../../types/Employee';
 import Bread from '../../components/Bread';
 import { getEmployees } from '../../services/EmployeeService';
+import { useEmployeeStore } from '../../util/useStore';
 
 const EmployeeList: FC = () => {
-	const [data, setData] = useState([]);
+	const { employees, setEmployees } = useEmployeeStore();
+
 	const routes = [
 		{
 			path: '/employees',
@@ -20,15 +22,14 @@ const EmployeeList: FC = () => {
 
 	const getData = async () => {
 		const { data } = await getEmployees();
-		console.log(data);
-		setData(data);
+		setEmployees(data);
 	};
 
 	useEffect(() => {
 		getData();
 	}, []);
 
-	const columns: ColumnProps<IEmployee[]>[] = [
+	const columns: ColumnProps<IEmployee>[] = [
 		{
 			title: 'ID',
 			dataIndex: 'id',
@@ -87,8 +88,8 @@ const EmployeeList: FC = () => {
 					bordered
 					pagination={{ total: 0 }}
 					columns={columns}
-					dataSource={data}
-					rowKey={(record) => record.id}
+					dataSource={employees}
+					rowKey={(record) => record['id']}
 				/>
 			</Layout.Content>
 		</>
