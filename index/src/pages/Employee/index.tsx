@@ -19,7 +19,11 @@ import { ColumnProps } from 'antd/lib/table';
 
 import { IEmployee } from '../../types/Employee';
 import Bread from '../../components/Bread';
-import { deleteEmployee, getEmployees } from '../../services/EmployeeService';
+import {
+	deleteEmployee,
+	getEmployees,
+	updateEmployee,
+} from '../../services/EmployeeService';
 import { useEmployeeStore } from '../../util/useStore';
 const { Option } = Select;
 
@@ -53,6 +57,7 @@ const EmployeeList: FC = () => {
 										deleteEmployee(record.id).then(
 											() => {
 												removeEmployee(record.id);
+
 												notification.success({
 													message: 'Success',
 													description: 'The record is deleted',
@@ -80,16 +85,43 @@ const EmployeeList: FC = () => {
 			breadcrumbName: 'Employees',
 		},
 	];
-
-	const getData = async () => {
-		const { data } = await getEmployees();
-		setEmployees(data);
+	const getData = () => {
+		getEmployees().then((res) => {
+			if (res && res.data && res.status === 200) {
+				const data = res.data;
+				setEmployees(data);
+			}
+		});
 	};
 
 	useEffect(() => {
 		getData();
-	}, []);
+	}, [setEmployees]);
 
+	const editEmployee = async () => {
+		try {
+			const id = form.getFieldValue('id');
+			const val = await form.validateFields();
+			console.log(val);
+
+			if (id) {
+				const res = await updateEmployee(id, val);
+				if (res && res.data && res.status === 200) {
+					notification.success({
+						message: 'Success',
+						description: 'The record is updated',
+					});
+
+					setEmployees(res.data);
+					form.resetFields();
+					setVisible(false);
+					getData();
+				}
+			}
+		} catch (e: any) {
+			console.log('Failed:', e);
+		}
+	};
 	const columns: ColumnProps<IEmployee>[] = [
 		{
 			title: 'ID',
@@ -171,12 +203,10 @@ const EmployeeList: FC = () => {
 			<Modal
 				title={'Update Record: Keep Your Information Current and Accurate'}
 				open={visible}
-				onOk={() => console.log(form.getFieldsValue())}
+				onOk={editEmployee}
 				okText={'Okay'}
 				cancelText={'Cancel'}
-				onCancel={() => {
-					setVisible(false);
-				}}>
+				onCancel={() => setVisible(false)}>
 				<Form
 					form={form}
 					layout='vertical'>
