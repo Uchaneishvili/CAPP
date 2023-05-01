@@ -1,17 +1,78 @@
 /** @format */
 
 import React, { FC, useEffect, useState } from 'react';
-
-import { Layout, Table } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import {
+	Button,
+	Dropdown,
+	Form,
+	Input,
+	Layout,
+	Menu,
+	Modal,
+	Select,
+	Space,
+	Table,
+	notification,
+} from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 
 import { IEmployee } from '../../types/Employee';
 import Bread from '../../components/Bread';
-import { getEmployees } from '../../services/EmployeeService';
+import { deleteEmployee, getEmployees } from '../../services/EmployeeService';
 import { useEmployeeStore } from '../../util/useStore';
+const { Option } = Select;
 
 const EmployeeList: FC = () => {
-	const { employees, setEmployees } = useEmployeeStore();
+	const { employees, setEmployees, removeEmployee } = useEmployeeStore();
+	const [form] = Form.useForm();
+	const [visible, setVisible] = useState(false);
+
+	const menu = (record: IEmployee) => {
+		return (
+			<Menu
+				items={[
+					{
+						key: 'edit',
+						label: (
+							<div
+								onClick={() => {
+									setVisible(true);
+									form.setFieldsValue(record);
+								}}>
+								Edit
+							</div>
+						),
+					},
+					{
+						key: 'delete',
+						label: (
+							<span
+								onClick={() => {
+									if (record.id) {
+										deleteEmployee(record.id).then(
+											() => {
+												removeEmployee(record.id);
+												notification.success({
+													message: 'Success',
+													description: 'The record is deleted',
+												});
+												getData();
+											},
+											(e) => {
+												console.log('Failed:', e);
+											}
+										);
+									}
+								}}>
+								Delete
+							</span>
+						),
+					},
+				]}
+			/>
+		);
+	};
 
 	const routes = [
 		{
@@ -70,6 +131,20 @@ const EmployeeList: FC = () => {
 			dataIndex: 'id',
 			width: 130,
 			fixed: 'right',
+			render(value, record, index) {
+				return (
+					<Space>
+						<Dropdown
+							overlay={menu(record)}
+							placement='bottomLeft'>
+							<Button
+								icon={<DownOutlined />}
+								size='small'
+							/>
+						</Dropdown>
+					</Space>
+				);
+			},
 		},
 	];
 
@@ -92,6 +167,98 @@ const EmployeeList: FC = () => {
 					rowKey={(record) => record['id']}
 				/>
 			</Layout.Content>
+
+			<Modal
+				title={'Update Record: Keep Your Information Current and Accurate'}
+				open={visible}
+				onOk={() => console.log(form.getFieldsValue())}
+				okText={'Okay'}
+				cancelText={'Cancel'}
+				onCancel={() => {
+					setVisible(false);
+				}}>
+				<Form
+					form={form}
+					layout='vertical'>
+					<Form.Item
+						name='name'
+						label='Name'
+						rules={[
+							{
+								required: true,
+								message: 'Please fill in all required fields',
+							},
+						]}>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						name='email'
+						label='Email'
+						rules={[
+							{
+								required: true,
+								message: 'Please fill in all required fields',
+							},
+						]}>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						name='gender'
+						label='Gender'
+						rules={[
+							{
+								required: true,
+								message: 'Please fill in all required fields',
+							},
+						]}>
+						<Select>
+							<Option
+								key={0}
+								value={'male'}>
+								{'Male'}
+							</Option>
+							<Option
+								key={1}
+								value={'female'}>
+								{'Female'}
+							</Option>
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name={['address', 'street']}
+						label='Street'
+						rules={[
+							{
+								required: true,
+								message: 'Please fill in all required fields',
+							},
+						]}>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						name={['address', 'city']}
+						label='City'
+						rules={[
+							{
+								required: true,
+								message: 'Please fill in all required fields',
+							},
+						]}>
+						<Input />
+					</Form.Item>
+					<Form.Item
+						name='phone'
+						label='Phone'
+						rules={[
+							{
+								required: true,
+								message: 'Please fill in all required fields',
+							},
+						]}>
+						<Input />
+					</Form.Item>
+				</Form>
+			</Modal>
 		</>
 	);
 };

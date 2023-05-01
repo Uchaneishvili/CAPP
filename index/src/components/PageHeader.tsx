@@ -13,6 +13,7 @@ const PageHeader: FC = () => {
 			key='user'
 			mode='horizontal'>
 			<SubMenu
+				key={'user'}
 				title={
 					<div style={{ width: '200px' }}>
 						<Fragment>
