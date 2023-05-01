@@ -1,15 +1,17 @@
 /** @format */
 
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, PlusOutlined } from '@ant-design/icons';
 import {
 	Button,
+	Col,
 	Dropdown,
 	Form,
 	Input,
 	Layout,
 	Menu,
 	Modal,
+	Row,
 	Select,
 	Space,
 	Table,
@@ -20,6 +22,7 @@ import { ColumnProps } from 'antd/lib/table';
 import { IEmployee } from '../../types/Employee';
 import Bread from '../../components/Bread';
 import {
+	createEmployee,
 	deleteEmployee,
 	getEmployees,
 	updateEmployee,
@@ -28,7 +31,8 @@ import { useEmployeeStore } from '../../util/useStore';
 const { Option } = Select;
 
 const EmployeeList: FC = () => {
-	const { employees, setEmployees, removeEmployee } = useEmployeeStore();
+	const { employees, setEmployees, removeEmployee, addEmployee } =
+		useEmployeeStore();
 	const [form] = Form.useForm();
 	const [visible, setVisible] = useState(false);
 
@@ -98,7 +102,8 @@ const EmployeeList: FC = () => {
 	useEffect(() => {
 		getData();
 	}, [getData]);
-	const editEmployee = async () => {
+
+	const saveAndUpdateEmployee = async () => {
 		try {
 			const id = form.getFieldValue('id');
 			const val = await form.validateFields();
@@ -112,6 +117,19 @@ const EmployeeList: FC = () => {
 					});
 
 					setEmployees(res.data);
+					form.resetFields();
+					setVisible(false);
+					getData();
+				}
+			} else {
+				const res = await createEmployee(val);
+				if (res && res.data && res.status === 200) {
+					notification.success({
+						message: 'Success',
+						description: 'The record is created',
+					});
+
+					addEmployee(res.data);
 					form.resetFields();
 					setVisible(false);
 					getData();
@@ -184,6 +202,21 @@ const EmployeeList: FC = () => {
 			<Bread routes={routes}></Bread>
 
 			<Layout.Content>
+				<Row
+					gutter={24}
+					style={{ paddingBottom: '10px' }}>
+					<Col flex='auto' />
+					<Col flex='100px'>
+						<Button
+							type='primary'
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setVisible(true);
+							}}>
+							{'add'}
+						</Button>
+					</Col>
+				</Row>
 				<Table
 					locale={{
 						triggerDesc: 'Descend',
@@ -200,9 +233,12 @@ const EmployeeList: FC = () => {
 			</Layout.Content>
 
 			<Modal
-				title={'Update Record: Keep Your Information Current and Accurate'}
+				title={
+					'Update Record: Keep Your Information Current and Accurate'
+					// : 'Create New Record: Add Your Data with Ease'
+				}
 				open={visible}
-				onOk={editEmployee}
+				onOk={saveAndUpdateEmployee}
 				okText={'Okay'}
 				cancelText={'Cancel'}
 				onCancel={() => setVisible(false)}>

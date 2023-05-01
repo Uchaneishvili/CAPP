@@ -7,6 +7,7 @@ type EmployeeState = {
 	employees: IEmployee[];
 	setEmployees: (employees: IEmployee[]) => void;
 	removeEmployee: (id: number) => void;
+	addEmployee: (employee: IEmployee) => void;
 };
 
 export const useEmployeeStore = create<EmployeeState>((set) => ({
@@ -17,4 +18,6 @@ export const useEmployeeStore = create<EmployeeState>((set) => ({
 			employees: state.employees.filter((employee) => employee.id !== id),
 		}));
 	},
+	addEmployee: (employee: IEmployee) =>
+		set((state) => ({ employees: [...state.employees, employee] })),
 }));
