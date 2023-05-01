@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { DownOutlined } from '@ant-design/icons';
 import {
 	Button,
@@ -85,24 +85,23 @@ const EmployeeList: FC = () => {
 			breadcrumbName: 'Employees',
 		},
 	];
-	const getData = () => {
-		getEmployees().then((res) => {
+
+	const getData = useCallback(async () => {
+		await getEmployees().then((res) => {
 			if (res && res.data && res.status === 200) {
 				const data = res.data;
 				setEmployees(data);
 			}
 		});
-	};
+	}, [setEmployees]);
 
 	useEffect(() => {
 		getData();
-	}, [setEmployees]);
-
+	}, [getData]);
 	const editEmployee = async () => {
 		try {
 			const id = form.getFieldValue('id');
 			const val = await form.validateFields();
-			console.log(val);
 
 			if (id) {
 				const res = await updateEmployee(id, val);
