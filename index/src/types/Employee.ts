@@ -11,7 +11,3 @@ export interface IEmployee {
 	};
 	phone: string;
 }
-
-export interface IEmployeeFilter {
-	name: string;
-}

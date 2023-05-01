@@ -1,14 +1,16 @@
 /** @format */
 
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { Layout, Table } from 'antd';
 import { ColumnProps } from 'antd/lib/table';
 
 import { IEmployee } from '../../types/Employee';
 import Bread from '../../components/Bread';
+import { getEmployees } from '../../services/EmployeeService';
 
 const EmployeeList: FC = () => {
+	const [data, setData] = useState([]);
 	const routes = [
 		{
 			path: '/employees',
@@ -16,16 +18,21 @@ const EmployeeList: FC = () => {
 		},
 	];
 
+	const getData = async () => {
+		const { data } = await getEmployees();
+		console.log(data);
+		setData(data);
+	};
+
+	useEffect(() => {
+		getData();
+	}, []);
+
 	const columns: ColumnProps<IEmployee[]>[] = [
 		{
 			title: 'ID',
 			dataIndex: 'id',
-			render: (val) => (val ? 'yes' : 'no'),
 			width: 250,
-			filters: [
-				{ text: 'no', value: '0' },
-				{ text: 'yes', value: '1' },
-			],
 		},
 		{
 			title: 'Name',
@@ -44,17 +51,17 @@ const EmployeeList: FC = () => {
 		},
 		{
 			title: 'Street',
-			dataIndex: 'address.street',
+			dataIndex: ['address', 'street'],
 			width: 250,
 		},
 		{
 			title: 'City',
-			dataIndex: 'address.city',
+			dataIndex: ['address', 'city'],
 			width: 250,
 		},
 		{
 			title: 'Phone',
-			dataIndex: 'Phone',
+			dataIndex: 'phone',
 			width: 250,
 		},
 		{
@@ -80,8 +87,8 @@ const EmployeeList: FC = () => {
 					bordered
 					pagination={{ total: 0 }}
 					columns={columns}
-					dataSource={[]}
-					// rowKey={(record) => record.id}
+					dataSource={data}
+					rowKey={(record) => record.id}
 				/>
 			</Layout.Content>
 		</>

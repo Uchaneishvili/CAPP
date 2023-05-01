@@ -7,10 +7,12 @@ import { IEmployee } from './types/employee';
 const axios = require('axios');
 const app = express();
 const fs = require('fs');
+const cors = require('cors');
 
 app.use(express.json());
 app.use(bodyParser.json());
-
+app.use(cors());
+	
 // The URL, which was given by you, is not working. So, I have hosted it on Gist Github.
 const URL =
 	'https://gist.githubusercontent.com/Uchaneishvili/fec48b15ccb68c08525d713c09449304/raw/7103bcfcbb2f10ed933a0c767e7d9accf40955cc/CAPP_Data';
