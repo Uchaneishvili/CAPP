@@ -75,7 +75,7 @@ const EmployeeList: FC = () => {
 					form.resetFields();
 					setVisible(false);
 					getData();
-					updateEmployeeStore(res.data);
+					updateEmployeeStore(id, res.data);
 				}
 			} else {
 				const res = await createEmployee(val);
