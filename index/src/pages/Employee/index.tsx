@@ -29,11 +29,16 @@ import { useEmployeeStore } from '../../util/useStore';
 const { Option } = Select;
 
 const EmployeeList: FC = () => {
-	const { employees, setEmployees, removeEmployee, addEmployee } =
-		useEmployeeStore();
+	const {
+		employees,
+		setEmployees,
+		removeEmployee,
+		addEmployee,
+		updateEmployeeStore,
+	} = useEmployeeStore();
 	const [form] = Form.useForm();
 	const [visible, setVisible] = useState(false);
-
+	const [update, setUpdate] = useState(false);
 	const routes = [
 		{
 			path: '/employees',
@@ -67,10 +72,10 @@ const EmployeeList: FC = () => {
 						description: 'The record is updated',
 					});
 
-					setEmployees(res.data);
 					form.resetFields();
 					setVisible(false);
 					getData();
+					updateEmployeeStore(res.data);
 				}
 			} else {
 				const res = await createEmployee(val);
@@ -80,10 +85,10 @@ const EmployeeList: FC = () => {
 						description: 'The record is created',
 					});
 
-					addEmployee(res.data);
 					form.resetFields();
 					setVisible(false);
 					getData();
+					addEmployee(res.data);
 				}
 			}
 		} catch (e: any) {
@@ -167,7 +172,7 @@ const EmployeeList: FC = () => {
 				<Row
 					gutter={24}
 					style={{ paddingBottom: '10px' }}>
-					<Col flex='auto' />
+					<Col flex='auto'></Col>
 					<Col flex='100px'>
 						<Button
 							type='primary'
@@ -188,6 +193,7 @@ const EmployeeList: FC = () => {
 					onRow={(record) => {
 						return {
 							onDoubleClick: () => {
+								setUpdate(true);
 								setVisible(true);
 								form.setFieldsValue(record);
 							},
@@ -197,9 +203,11 @@ const EmployeeList: FC = () => {
 			</Layout.Content>
 
 			<Modal
+				style={{ textAlign: 'center' }}
 				title={
-					'Update Record: Keep Your Information Current and Accurate'
-					// : 'Create New Record: Add Your Data with Ease'
+					update
+						? 'Edit Record: Make Changes to Your Information'
+						: 'Create New Record: Add Your Data with Ease'
 				}
 				open={visible}
 				onOk={saveAndUpdateEmployee}
@@ -207,6 +215,7 @@ const EmployeeList: FC = () => {
 				cancelText={'Cancel'}
 				onCancel={() => setVisible(false)}>
 				<Form
+					style={{ textAlign: 'initial' }}
 					form={form}
 					layout='vertical'>
 					<Form.Item
