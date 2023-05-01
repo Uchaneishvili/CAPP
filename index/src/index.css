@@ -4,6 +4,10 @@ body {
 	margin: 0;
 }
 
+tbody > tr {
+	cursor: pointer;
+}
+
 .breadCrumb {
 	margin: 10px 0px;
 	background: #ffffff;

@@ -1,11 +1,10 @@
 /** @format */
 
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { DownOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import {
 	Button,
 	Col,
-	Dropdown,
 	Form,
 	Input,
 	Layout,
@@ -13,7 +12,6 @@ import {
 	Modal,
 	Row,
 	Select,
-	Space,
 	Table,
 	notification,
 } from 'antd';
@@ -35,53 +33,6 @@ const EmployeeList: FC = () => {
 		useEmployeeStore();
 	const [form] = Form.useForm();
 	const [visible, setVisible] = useState(false);
-
-	const menu = (record: IEmployee) => {
-		return (
-			<Menu
-				items={[
-					{
-						key: 'edit',
-						label: (
-							<div
-								onClick={() => {
-									setVisible(true);
-									form.setFieldsValue(record);
-								}}>
-								Edit
-							</div>
-						),
-					},
-					{
-						key: 'delete',
-						label: (
-							<span
-								onClick={() => {
-									if (record.id) {
-										deleteEmployee(record.id).then(
-											() => {
-												removeEmployee(record.id);
-
-												notification.success({
-													message: 'Success',
-													description: 'The record is deleted',
-												});
-												getData();
-											},
-											(e) => {
-												console.log('Failed:', e);
-											}
-										);
-									}
-								}}>
-								Delete
-							</span>
-						),
-					},
-				]}
-			/>
-		);
-	};
 
 	const routes = [
 		{
@@ -182,16 +133,27 @@ const EmployeeList: FC = () => {
 			fixed: 'right',
 			render(value, record, index) {
 				return (
-					<Space>
-						<Dropdown
-							overlay={menu(record)}
-							placement='bottomLeft'>
-							<Button
-								icon={<DownOutlined />}
-								size='small'
-							/>
-						</Dropdown>
-					</Space>
+					<Button
+						onClick={() => {
+							if (record.id) {
+								deleteEmployee(record.id).then(
+									() => {
+										removeEmployee(record.id);
+
+										notification.success({
+											message: 'Success',
+											description: 'The record is deleted',
+										});
+										getData();
+									},
+									(e) => {
+										console.log('Failed:', e);
+									}
+								);
+							}
+						}}>
+						<DeleteOutlined />
+					</Button>
 				);
 			},
 		},
@@ -218,17 +180,19 @@ const EmployeeList: FC = () => {
 					</Col>
 				</Row>
 				<Table
-					locale={{
-						triggerDesc: 'Descend',
-						triggerAsc: 'Ascend',
-						cancelSort: 'Cancel Sorting',
-						filterReset: 'Reset',
-					}}
 					bordered
 					pagination={{ total: 0 }}
 					columns={columns}
 					dataSource={employees}
 					rowKey={(record) => record['id']}
+					onRow={(record) => {
+						return {
+							onDoubleClick: () => {
+								setVisible(true);
+								form.setFieldsValue(record);
+							},
+						};
+					}}
 				/>
 			</Layout.Content>
 
