@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, useCallback } from 'react';
 import { Pie } from '@ant-design/plots';
 import { useEmployeeStore } from '../../util/useStore';
 import { calculatePercentagesOfCities } from '../../services/StatisticsService';
@@ -10,15 +10,18 @@ const Statistics: FC = () => {
 	const { employees } = useEmployeeStore();
 	const [data, setData] = useState([{}]);
 
-	const getStatistics = async () => {
-		const { data } = await calculatePercentagesOfCities(employees);
-
-		setData(data);
-	};
+	const getData = useCallback(async () => {
+		await calculatePercentagesOfCities(employees).then((res) => {
+			if (res && res.data && res.status === 200) {
+				const data = res.data;
+				setData(data);
+			}
+		});
+	}, [employees]);
 
 	useEffect(() => {
-		getStatistics();
-	}, []);
+		getData();
+	}, [getData]);
 
 	const config = {
 		appendPadding: 10,
