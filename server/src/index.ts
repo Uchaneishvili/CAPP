@@ -3,6 +3,7 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import { IEmployee } from './types/employee';
+import { IPercentage } from './types/percentage';
 
 const axios = require('axios');
 const app = express();
@@ -67,7 +68,7 @@ app.post('/', async (req: Request, res: Response) => {
 	}
 });
 
-// POST request to add all data to local file
+// POST request to add all data from JSON URL to local file
 app.post('/allData', async (req: Request, res: Response) => {
 	try {
 		const { data } = await axios.get(URL);
@@ -123,6 +124,32 @@ app.delete('/:id', async (req: Request, res: Response) => {
 	}
 });
 
+// To display a pie chart of employee cities, I have create a method that calculates the percentages of each city according to the data in useEmployeeStore (using Zustand)
+app.post('/city-percentages', (req, res) => {
+	const data = req.body;
+
+	const cities = data.map(
+		(employee: { address: { city: string } }) => employee.address.city
+	);
+	const cityCounts: Record<string, number> = cities.reduce(
+		(acc: any, curr: any) => {
+			acc[curr] = (acc[curr] || 0) + 1;
+			return acc;
+		},
+		{}
+	);
+	const totalEmployees: number = cities.length;
+	const cityPercentages: IPercentage[] = [];
+
+	for (const city in cityCounts) {
+		const calcPercentage = (cityCounts[city] / totalEmployees) * 100;
+		const percentage: number = Math.round(calcPercentage * 100) / 100;
+		cityPercentages.push({ type: city, value: percentage });
+	}
+
+	res.json(cityPercentages);
+});
+
 app.listen(8000, () => {
-	console.log('Server started on port 3000');
+	console.log('Server started on port 8000');
 });
